@@ -1,0 +1,119 @@
+<html>
+<%- include('_tailwind_head', { title: 'Notifications' }) %>
+
+    <body class="bg-gray-100 min-h-screen">
+        <div class="max-w-2xl mx-auto py-10">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold">Notification Feed</h2>
+                <a href="/logout" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">Logout</a>
+            </div>
+            <% if (role==='Manager' ) { %>
+                <form id="notificationForm" class="flex gap-2 mb-6">
+                    <input name="message" id="message" placeholder="Message" required
+                        class="flex-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                    <select name="priority" id="priority"
+                        class="px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="normal">Normal</option>
+                        <option value="high">High</option>
+                    </select>
+                    <button type="submit"
+                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Send</button>
+                </form>
+                <% } %>
+                    <ul id="feed" class="space-y-4">
+                        <% if (notifications.length===0) { %>
+                            <li
+                                class="no-notifications flex flex-col items-center justify-center py-10 bg-white rounded shadow">
+                                <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor"
+                                    stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
+                                </svg>
+                                <span class="text-gray-500 text-lg font-semibold">No notifications yet</span>
+                                <span class="text-gray-400 mt-2">You'll see notifications here when they arrive.</span>
+                            </li>
+                            <% } else { %>
+                                <% notifications.forEach(n=> { %>
+                                    <li class="p-4 rounded shadow flex items-center gap-4 <%= n.priority === 'high' ? 'bg-red-100' : 'bg-gray-50' %>"
+                                        data-id="<%= n._id %>">
+                                        <span
+                                            class="px-3 py-1 rounded text-xs font-bold <%= n.priority === 'high' ? 'bg-red-500 text-white' : 'bg-gray-400 text-gray-800' %>">
+                                            <%= n.priority.toUpperCase() %>
+                                        </span>
+                                        <span class="flex-1">
+                                            <%= n.message %>
+                                                <span class="block text-xs text-gray-500 mt-1">Sent by: <%= n.senderName
+                                                        %>
+                                                </span>
+                                        </span>
+                                        <small class="text-gray-500">
+                                            <%= new Date(n.createdAt).toLocaleString() %>
+                                        </small>
+                                    </li>
+                                    <% }) %>
+                                        <% } %>
+                    </ul>
+                    <!-- Infinite scroll loader removed -->
+
+                    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+                    <script>
+                        // Add new notification to the top of the feed (real-time only)
+                        function addNotificationToFeed(n, prepend = true) {
+                            // Remove "No notifications yet" message if present
+                            const emptyState = document.querySelector('#feed .no-notifications');
+                            if (emptyState) emptyState.remove();
+
+                            // Prevent duplicates
+                            if (document.querySelector(`#feed li[data-id='${n._id}']`)) return;
+                            const li = document.createElement('li');
+                            li.setAttribute('data-id', n._id);
+                            li.className = `p-4 rounded shadow flex items-center gap-4 ${n.priority === 'high' ? 'bg-red-100' : 'bg-gray-50'}`;
+                            li.innerHTML = `<span class='px-3 py-1 rounded text-xs font-bold ${n.priority === 'high' ? 'bg-red-500 text-white' : 'bg-gray-400 text-gray-800'}'>${n.priority.toUpperCase()}</span> <span class='flex-1'>${n.message} <span class='block text-xs text-gray-500 mt-1'>Sent by: ${n.senderName}</span></span> <small class='text-gray-500'>${new Date(n.createdAt).toLocaleString()}</small>`;
+                            const feed = document.getElementById('feed');
+                            if (prepend) {
+                                feed.prepend(li);
+                            } else {
+                                feed.appendChild(li);
+                            }
+                        }
+                        const socket = io();
+                        socket.emit('userOnline', '<%= userId ?? "" %>');
+                        socket.on('newNotification', function (n) {
+                            addNotificationToFeed(n, true);
+                        });
+
+                        // Infinite scrolling logic removed
+                    </script>
+
+                    <% if (role==='Manager' ) { %>
+                        <script>
+                            document.getElementById('notificationForm').addEventListener('submit', async function (e) {
+                                e.preventDefault();
+                                const message = document.getElementById('message').value;
+                                const priority = document.getElementById('priority').value;
+                                try {
+                                    const res = await fetch('/notifications', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({ message, priority })
+                                    });
+                                    if (res.ok) {
+                                        document.getElementById('message').value = '';
+                                        document.getElementById('priority').value = 'normal';
+                                        // Optionally, you can get the notification from the response and add it immediately
+                                        // const n = await res.json();
+                                        // addNotificationToFeed(n);
+                                        // But usually, the socket event will handle it
+                                    }
+                                } catch (err) {
+                                    alert('Failed to send notification');
+                                }
+                            });
+                        </script>
+                        <% } %>
+    </body>
+
+</html>
