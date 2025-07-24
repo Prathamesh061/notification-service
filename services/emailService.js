@@ -4,8 +4,8 @@ const { ENVIRONMENT } = require('../utils/constants');
 
 exports.sendHighPriorityEmails = async (users, notification) => {
     const transporter = nodemailer.createTransport({
-        port: 587,
-        host: "smtp.gmail.com",
+        port: config.smtpPort,
+        host: config.smtpHost,
         secure: config.environment == ENVIRONMENT.PROD,
         auth: {
             user: config.emailUser,
