@@ -48,20 +48,6 @@ This project is a full-stack notification system for remote teams, featuring rea
    npm run dev
    ```
 
-### Frontend Setup (if applicable)
-If you have a separate frontend:
-1. Navigate to the frontend folder:
-   ```bash
-   cd ../frontend
-   npm install
-   ```
-2. Start the frontend server:
-   ```bash
-   npm run dev
-   ```
-
----
-
 ## Environment Variables
 Create a `.env` file in the `backend` directory. Example:
 ```
