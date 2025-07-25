@@ -1,32 +1,41 @@
 
 
-# 🚀 Notification Service for Remote Teams
+
+# 🚀 Notification System for Remote Teams
 
 This project is a full-stack notification system for remote teams, featuring real-time updates, role-based access, and email alerts for offline users and managers.
 
-## Features
-- Role-based user management (Manager/User)
-- JWT authentication
-- Real-time notifications (Socket.IO)
-- Priority-based notifications (High/Normal) using constants
-- Email notifications for offline users and managers (SMTP)
-- EJS-based UI styled with Tailwind CSS
-- MongoDB for persistent storage
+## Live Demo
+
+- 🌐 [Deployed App on Render](https://notification-service-tn15.onrender.com/)
+- 💻 [Source Code on GitHub](https://github.com/Prathamesh061/notification-service)
 
 ---
 
-## Getting Started
+## How to Use (Deployed App)
+
+1. Visit [https://notification-service-tn15.onrender.com/](https://notification-service-tn15.onrender.com/)
+2. Sign up as a **Manager** or **User** (choose your role during signup)
+3. Log in with your credentials
+4. **Managers** can create notifications (choose priority: normal or high)
+5. All logged-in users (including managers) will see notifications in real time
+6. If a notification is high priority and a user is offline, an email will be sent to them
+7. Normal notifications auto-delete after 2 days; high-priority notifications persist
+
+---
+
+## How to Run Locally
 
 ### Prerequisites
 - Node.js (v16+ recommended)
 - npm
 - MongoDB (local or cloud)
 
-### Backend Setup
-1. Clone the repository and navigate to the backend folder:
+### Setup
+1. Clone the repository:
    ```bash
-   git clone <repo-url>
-   cd notification-service/backend
+   git clone https://github.com/Prathamesh061/notification-service.git
+   cd notification-service
    ```
 2. Install dependencies:
    ```bash
@@ -47,6 +56,9 @@ This project is a full-stack notification system for remote teams, featuring rea
    ```bash
    npm run dev
    ```
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+---
 
 ## Environment Variables
 Create a `.env` file in the `backend` directory. Example:
@@ -65,11 +77,22 @@ ENVIRONMENT=development
 
 ---
 
-## Usage
-1. Open [http://localhost:3000](http://localhost:3000) in your browser.
-2. Sign up as a user or manager.
-3. Managers can send notifications with priority (High/Normal).
-4. Offline users/managers will receive email alerts for high-priority notifications.
+## Machine Test Requirements (Implemented)
+
+- Sign Up flow with role selector (Manager/User)
+- JWT-based login/authentication
+- Role-based API protection
+- Managers can create notifications (message, priority)
+- Real-time notification feed for all users (Socket.IO)
+- Notifications saved in MongoDB
+- Normal notifications auto-delete after 2 days
+- High-priority notifications persist
+- Email simulation for offline users (console log or real email)
+- Single notification feed for all users
+- Priority badge (red for High, gray for Normal)
+- Feed auto-refreshes (real-time)
+- Role-based access (Managers: add, Users: view)
+- .env sample provided
 
 ---
 
